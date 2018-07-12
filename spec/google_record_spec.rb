@@ -1,11 +1,7 @@
 require_relative '../google_record'
 
 class SierraItem
-  attr_accessor :rec_data, :varfields
-  
-  def read_item_record
-  end
-
+  attr_accessor :rec_data, :varfield_data
 end
 
 RSpec.describe GoogleRecord do
@@ -19,12 +15,12 @@ RSpec.describe GoogleRecord do
       copy_num: "1",
       is_suppressed: "f"
     }
-    item.varfields = {
-      "b"=>[{id: "8978778", record_id: "450974227090", varfield_type_code: "b",marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "00001254305"}],
-      "c"=>[{id: "8978779", record_id: "450974227090", varfield_type_code: "c", marc_tag: "090", marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "|aPR6056.A82 S6"}],
-      "v"=>[{id: "8978771", record_id: "450974227090", varfield_type_code: "v", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "v.2"}],
-      "z"=>[{id: "8978772", record_id: "450974227090", varfield_type_code: "z", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "public_note"}]
-    }
+    item.varfield_data = [
+      {id: "8978778", record_id: "450974227090", varfield_type_code: "b", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "00001254305"},
+      {id: "8978779", record_id: "450974227090", varfield_type_code: "c", marc_tag: "090", marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "|aPR6056.A82 S6"},
+      {id: "8978771", record_id: "450974227090", varfield_type_code: "v", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "v.2"},
+      {id: "8978772", record_id: "450974227090", varfield_type_code: "z", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "public_note"}
+    ]
     grec = GoogleRecord.new(bib, item)
     m955 = grec.my955
 
