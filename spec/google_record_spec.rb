@@ -1,26 +1,36 @@
 require_relative '../google_record'
 
-class SierraItem
-  attr_accessor :rec_data, :varfield_data
+def set_attr(obj, attr, value)
+  obj.instance_variable_set("@#{attr}", value)
+end
+
+def mock_struct(hsh = {zzz: nil})
+  Struct.new(*hsh.keys).new(*hsh.values)
 end
 
 RSpec.describe GoogleRecord do
   describe 'my955' do
     bib = SierraBib.new('b1841152a')
     item = SierraItem.new('i2661010a')
-    item.rec_data = {
-      itype_code_num: "0",
-      location_code: 'trln',
-      item_status_code: "-",
-      copy_num: "1",
-      is_suppressed: "f"
-    }
-    item.varfield_data = [
-      {id: "8978778", record_id: "450974227090", varfield_type_code: "b", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "00001254305"},
-      {id: "8978779", record_id: "450974227090", varfield_type_code: "c", marc_tag: "090", marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "|aPR6056.A82 S6"},
-      {id: "8978771", record_id: "450974227090", varfield_type_code: "v", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "v.2"},
-      {id: "8978772", record_id: "450974227090", varfield_type_code: "z", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "public_note"}
-    ]
+    set_attr(
+      item,
+      :item_record,
+      mock_struct(itype_code_num: 0,
+                  location_code: 'trln',
+                  item_status_code: "-",
+                  copy_num: 1,
+                  is_suppressed: false)
+    )
+    set_attr(
+      item,
+      :varfield,
+      [
+        {id: "8978778", record_id: "450974227090", varfield_type_code: "b", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "00001254305"},
+        {id: "8978779", record_id: "450974227090", varfield_type_code: "c", marc_tag: "090", marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "|aPR6056.A82 S6"},
+        {id: "8978771", record_id: "450974227090", varfield_type_code: "v", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "v.2"},
+        {id: "8978772", record_id: "450974227090", varfield_type_code: "z", marc_tag: nil, marc_ind1: " ", marc_ind2: " ", occ_num: "0", field_content: "public_note"}
+      ].map { |r| mock_struct(r) }
+    )
     grec = GoogleRecord.new(bib, item)
     m955 = grec.my955
 
@@ -64,7 +74,7 @@ RSpec.describe GoogleRecord do
       expect(m955[sftag]).to eq("Book")
     end
 
-    it 'sets $c as copy number' do
+    it 'sets $c as copy number as string' do
       sftag = 'c'
       expect(m955[sftag]).to eq("1")
     end
@@ -73,13 +83,15 @@ RSpec.describe GoogleRecord do
   describe 'check_marc' do
     bib = SierraBib.new('b1841152a')
     item = SierraItem.new('i2661010a')
-    item.rec_data = {
-      itype_code_num: "0",
-      location_code: 'trln',
-      item_status_code: "w",
-      copy_num: "1",
-      is_suppressed: "t"
-    }
+    set_attr(
+      item,
+      :item_record,
+      mock_struct(itype_code_num: 0,
+                  location_code: 'trln',
+                  item_status_code: "w",
+                  copy_num: 1,
+                  is_suppressed: true)
+    )
     grec = GoogleRecord.new(bib, item)
     grec.check_marc
 
@@ -91,15 +103,17 @@ RSpec.describe GoogleRecord do
       expect(grec.warnings.include?('Item record is withdrawn')).to be true
     end
 
-    context 'is not suppressed or withdrawn' do
+    context 'when bib is not suppressed or withdrawn' do
       item2 = SierraItem.new('i2661010a')
-      item2.rec_data = {
-        itype_code_num: "0",
-        location_code: 'trln',
-        item_status_code: "-",
-        copy_num: "1",
-        is_suppressed: "f"
-      }
+      set_attr(
+        item2,
+        :item_record,
+        mock_struct(itype_code_num: 0,
+                    location_code: 'trln',
+                    item_status_code: "-",
+                    copy_num: 1,
+                    is_suppressed: false)
+      )
       grec2 = GoogleRecord.new(bib, item2)
       grec2.check_marc
 

@@ -2,7 +2,7 @@ require_relative '../sierra-postgres-utilities/lib/sierra_postgres_utilities.rb'
 
 class GoogleRecord < DerivativeRecord
   attr_reader :item, :inum
-  
+
   def initialize(sierra_bib, sierra_item)
     super(sierra_bib)
     @item = sierra_item
@@ -20,7 +20,7 @@ class GoogleRecord < DerivativeRecord
     m955.add_subfields!('l', @item.location_code)
     m955.add_subfields!('s', @item.status_description)
     m955.add_subfields!('t', @item.itype_description)
-    m955.add_subfields!('c', @item.copy_num)
+    m955.add_subfields!('c', @item.copy_num.to_s)
 
     return nil if m955.subfields.empty?
     return m955
