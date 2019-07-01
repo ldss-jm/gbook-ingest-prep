@@ -1,4 +1,4 @@
-require_relative '../sierra-postgres-utilities/lib/sierra_postgres_utilities.rb'
+require 'sierra_postgres_utilities'
 
 class GoogleRecord < DerivativeRecord
   attr_reader :item, :inum
